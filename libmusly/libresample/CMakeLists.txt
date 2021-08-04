@@ -3,7 +3,7 @@
 
 # (c) 2013-2014, Dominik Schnitzer <dominik@schnitzer.at>
 
-find_file(HAVE_INTTYPES inttypes.h)
+find_file(HAVE_INTTYPES_H inttypes.h)
 configure_file(config.h.in config.h)
 
 add_library(musly_resample
