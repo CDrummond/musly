@@ -88,7 +88,11 @@ include_directories(
 
 add_subdirectory(external)
 add_subdirectory(libmusly)
-add_subdirectory(musly)
+
+option(BUILD_APP "Build musly app" OFF)
+if (BUILD_APP)
+    add_subdirectory(musly)
+endif()
 add_subdirectory(include)
 if (BUILD_TEST)
     enable_testing()
