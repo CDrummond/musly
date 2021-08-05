@@ -33,7 +33,7 @@ timbre::timbre() :
         sample_rate(22050),
         window_size(1024),
         hop(0.5f),
-        max_pcmlength(60*sample_rate),
+        max_pcmlength(5*60*sample_rate),
         ps_bins(window_size/2+1),
         mel_bins(36),
         mfcc_bins(25),
