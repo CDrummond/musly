@@ -80,7 +80,10 @@ endif ()
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 find_package(Eigen3 REQUIRED)
-find_package(LibAV 0.8 COMPONENTS avcodec avformat avutil REQUIRED)
+option(USE_LIBAV "Compile with LibAV (decoder) support" ON)
+if (USE_LIBAV)
+    find_package(LibAV 0.8 COMPONENTS avcodec avformat avutil REQUIRED)
+endif()
 
 include_directories(
     "${PROJECT_BINARY_DIR}"

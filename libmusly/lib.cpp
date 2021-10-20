@@ -38,11 +38,15 @@
 
 #include "methods/mandelellis.h"
 #include "methods/timbre.h"
+#ifdef HAVE_LIBAV
 #include "decoders/libav.h"
+#endif
 
 MUSLY_METHOD_REGSTATIC(mandelellis, 0);
 MUSLY_METHOD_REGSTATIC(timbre, 1);
+#ifdef HAVE_LIBAV
 MUSLY_DECODER_REGSTATIC(libav, 0);
+#endif
 
 #ifdef LIBMUSLY_EXTERNAL
 #include "external/register_static.h"
@@ -94,7 +98,11 @@ musly_jukebox_aboutmethod(
 musly_jukebox*
 musly_jukebox_poweron(
         const char* method,
-        const char* decoder)
+        const char*
+#ifdef HAVE_LIBAV
+        decoder
+#endif
+        )
 {
     // try initializing the similarity method
     std::string method_str;
@@ -110,6 +118,7 @@ musly_jukebox_poweron(
         return NULL;
     }
 
+#ifdef HAVE_LIBAV
     // try initializing the selected decoder
     std::string decoder_str;
     if (!decoder) {
@@ -124,7 +133,7 @@ musly_jukebox_poweron(
         delete m;
         return NULL;
     }
-
+#endif
     // if we succeeded in both, return the jukebox!
     musly_jukebox* mj = new musly_jukebox;
     mj->method = reinterpret_cast<void*>(m);
@@ -132,10 +141,15 @@ musly_jukebox_poweron(
     method_str.copy(mj->method_name, method_str.size());
     mj->method_name[method_str.size()] = '\0';
 
+#ifdef HAVE_LIBAV
     mj->decoder = reinterpret_cast<void*>(d);
     mj->decoder_name = new char[decoder_str.size()+1];
     decoder_str.copy(mj->decoder_name, decoder_str.size());
     mj->decoder_name[decoder_str.size()] = '\0';
+#else
+    mj->decoder = NULL;
+    mj->decoder_name = NULL;
+#endif
     return mj;
 }
 
