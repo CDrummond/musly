@@ -66,6 +66,9 @@ enum minilog_level {
 inline std::string
 minilog_get_timestr()
 {
+    #ifdef __GNUC__
+    return "";
+    #else
     const int MAX_LEN = 100;
     char buffer[MAX_LEN];
 
@@ -79,6 +82,7 @@ minilog_get_timestr()
     sprintf(result, "%s.%03lld", buffer, (LONGLONG)(GetTickCount64() - first) % 1000);
 
     return result;
+    #endif
 }
 
 // get_timestr() for Linux, OSX

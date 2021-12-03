@@ -9,5 +9,7 @@ add_library(getopt_windows STATIC
 target_include_directories(getopt_windows INTERFACE
     ${CMAKE_CURRENT_LIST_DIR})
 
+if (MSVC)
 target_compile_options(getopt_windows PRIVATE
     /W4)
+endif()

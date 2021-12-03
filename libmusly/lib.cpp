@@ -98,10 +98,7 @@ musly_jukebox_aboutmethod(
 musly_jukebox*
 musly_jukebox_poweron(
         const char* method,
-        const char*
-#ifdef HAVE_LIBAV
-        decoder
-#endif
+        const char* decoder
         )
 {
     // try initializing the similarity method
@@ -118,7 +115,6 @@ musly_jukebox_poweron(
         return NULL;
     }
 
-#ifdef HAVE_LIBAV
     // try initializing the selected decoder
     std::string decoder_str;
     if (!decoder) {
@@ -131,9 +127,10 @@ musly_jukebox_poweron(
                     musly::plugins::DECODER_TYPE, decoder_str));
     if (!d) {
         delete m;
+#ifdef HAVE_LIBAV
         return NULL;
-    }
 #endif
+    }
     // if we succeeded in both, return the jukebox!
     musly_jukebox* mj = new musly_jukebox;
     mj->method = reinterpret_cast<void*>(m);
@@ -141,15 +138,15 @@ musly_jukebox_poweron(
     method_str.copy(mj->method_name, method_str.size());
     mj->method_name[method_str.size()] = '\0';
 
-#ifdef HAVE_LIBAV
-    mj->decoder = reinterpret_cast<void*>(d);
-    mj->decoder_name = new char[decoder_str.size()+1];
-    decoder_str.copy(mj->decoder_name, decoder_str.size());
-    mj->decoder_name[decoder_str.size()] = '\0';
-#else
-    mj->decoder = NULL;
-    mj->decoder_name = NULL;
-#endif
+    if (d) {
+        mj->decoder = reinterpret_cast<void*>(d);
+        mj->decoder_name = new char[decoder_str.size()+1];
+        decoder_str.copy(mj->decoder_name, decoder_str.size());
+        mj->decoder_name[decoder_str.size()] = '\0';
+    } else {
+        mj->decoder = NULL;
+        mj->decoder_name = NULL;
+    }
     return mj;
 }
 
