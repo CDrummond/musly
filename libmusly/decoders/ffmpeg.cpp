@@ -71,8 +71,8 @@ static int get_duration(const std::string &path) {
     return length;
 }
 
-static char * format_time(float time) {
-    static char str[12];
+static std::string format_time(float time) {
+    char str[34];
     int t = (int)time;
     int h = t /3600;
     time = t %3600;
@@ -80,7 +80,7 @@ static char * format_time(float time) {
     time = t %60;
     int s = t ;
     sprintf(str, "%02d:%02d:%02d.00", h, m, s);
-    return str;
+    return std::string(str);
 }
 
 
