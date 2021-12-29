@@ -35,10 +35,11 @@ static int get_duration(const std::string &path) {
     std::string cmd = "ffprobe -hide_banner \"" + path + "\" 2>&1";
     auto pipe = popen(cmd.c_str(), "r");
     if (!pipe) {
-        MINILOG(logTRACE) << "Failed to start ffprobe";
+        MINILOG(logDEBUG) << "Failed to start ffprobe";
         return -1;
     }
 
+    MINILOG(logDEBUG) << "Running command:" << cmd;
     char line[constMaxLineLen+1];
     while (!feof(pipe)) {
         if (fgets(line, constMaxLineLen, pipe) != nullptr) {
@@ -68,6 +69,7 @@ static int get_duration(const std::string &path) {
         }
     };
     pclose(pipe);
+    MINILOG(logDEBUG) << "File duration:" << length;
     return length;
 }
 
@@ -78,7 +80,7 @@ static std::string format_time(float time) {
     time = t %3600;
     int m = t /60;
     time = t %60;
-    int s = t ;
+    int s = (int)time; ;
     sprintf(str, "%02d:%02d:%02d.00", h, m, s);
     return std::string(str);
 }
@@ -91,7 +93,7 @@ std::vector<float> ffmpeg::decodeto_22050hz_mono_float(
         const std::string& file,
         float excerpt_length,
         float excerpt_start) {
-    MINILOG(logTRACE) << "Decoding: " << file << " started.";
+    MINILOG(logDEBUG) << "Decoding: " << file << " started.";
 
     std::vector<float> pcm;
     int duration = get_duration(file);
@@ -116,9 +118,10 @@ std::vector<float> ffmpeg::decodeto_22050hz_mono_float(
         cmd+=" -ss " + start + " -t " + end;
     }
     cmd += " -i \"" + file + "\" -f f32le -ar 22050 -ac 1 pipe:1";
-    auto pipe = popen(cmd.c_str(), "r");
+    MINILOG(logDEBUG) << "Running command:" << cmd;
+    auto pipe = popen(cmd.c_str(), "rb");
     if (!pipe) {
-        MINILOG(logTRACE) << "Failed to start ffmpeg";
+        MINILOG(logDEBUG) << "Failed to start ffmpeg";
         return pcm;
     }
 
@@ -129,8 +132,9 @@ std::vector<float> ffmpeg::decodeto_22050hz_mono_float(
             pcm.insert(pcm.end(), buffer, buffer+numRead);
         }
     }
+    pclose(pipe);
 
-    MINILOG(logTRACE) << "Decoding: " << file << " finalized.";
+    MINILOG(logDEBUG) << "Decoding: " << file << " finalized, samples:" << pcm.size();
     return pcm;
 }
 
