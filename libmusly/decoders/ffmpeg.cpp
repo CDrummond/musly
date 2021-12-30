@@ -21,6 +21,26 @@
 #include "ffmpeg.h"
 #include "minilog.h"
 
+#ifdef _WIN32
+#include <Windows.h>
+#include <wchar.h>
+
+std::wstring conv(const std::string &str) {
+    int count = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), NULL, 0);
+    std::wstring wstr(count, 0);
+    MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), &wstr[0], count);
+    return wstr;
+}
+
+inline FILE * openproc(const std::string &cmd, const char *mode) {
+    return _wpopen(conv(cmd).c_str(), conv(mode).c_str());
+}
+#else
+inline FILE * openproc(const std::string &cmd, const char *mode) {
+    return popen(cmd.c_str(), mode);
+}
+#endif
+
 namespace musly {
 namespace decoders {
 
@@ -33,7 +53,7 @@ static const size_t constReadBuffer = 50000;
 static int get_duration(const std::string &path) {
     int length = -1;
     std::string cmd = "ffprobe -hide_banner \"" + path + "\" 2>&1";
-    auto pipe = popen(cmd.c_str(), "r");
+    auto pipe = openproc(cmd, "r");
     if (!pipe) {
         MINILOG(logDEBUG) << "Failed to start ffprobe";
         return -1;
@@ -119,7 +139,7 @@ std::vector<float> ffmpeg::decodeto_22050hz_mono_float(
     }
     cmd += " -i \"" + file + "\" -f f32le -ar 22050 -ac 1 pipe:1";
     MINILOG(logDEBUG) << "Running command:" << cmd;
-    auto pipe = popen(cmd.c_str(), "rb");
+    auto pipe = openproc(cmd, "rb");
     if (!pipe) {
         MINILOG(logDEBUG) << "Failed to start ffmpeg";
         return pcm;
