@@ -79,26 +79,23 @@ set(LIBMUSLY_METHODS_H
     methods/mandelellis.h
     methods/timbre.h
 )
-set(LIBMUSLY_DECODERS_CPP
-    decoders/ffmpeg.cpp
-)
-set(LIBMUSLY_DECODERS_H
-    decoders/ffmpeg.h
-)
-
 if (LIBAV_FOUND)
 set(LIBMUSLY_CPP
     ${LIBMUSLY_CPP}
     resampler.cpp
 )
-
 set(LIBMUSLY_DECODERS_CPP
-    ${LIBMUSLY_DECODERS_CPP}
     decoders/libav.cpp
 )
 set(LIBMUSLY_DECODERS_H
-    ${LIBMUSLY_DECODERS_H}
     decoders/libav.h
+)
+else()
+set(LIBMUSLY_DECODERS_CPP
+    decoders/ffmpeg.cpp
+)
+set(LIBMUSLY_DECODERS_H
+    decoders/ffmpeg.h
 )
 endif()
 

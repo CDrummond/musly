@@ -40,13 +40,18 @@
 #include "methods/timbre.h"
 #ifdef HAVE_LIBAV
 #include "decoders/libav.h"
+#else
+#include "decoders/ffmpeg.h"
 #endif
 
 MUSLY_METHOD_REGSTATIC(mandelellis, 0);
 MUSLY_METHOD_REGSTATIC(timbre, 1);
 #ifdef HAVE_LIBAV
 MUSLY_DECODER_REGSTATIC(libav, 0);
+#else
+MUSLY_DECODER_REGSTATIC(ffmpeg, 0);
 #endif
+
 
 #ifdef LIBMUSLY_EXTERNAL
 #include "external/register_static.h"
@@ -125,11 +130,25 @@ musly_jukebox_poweron(
     musly::decoder* d = reinterpret_cast<musly::decoder*>(
             musly::plugins::instantiate_plugin(
                     musly::plugins::DECODER_TYPE, decoder_str));
+
+    if (!d) {
+        // If fail to find decoder, try its alternative...
+        if (decoder_str=="libav") {
+            decoder_str = "ffmpeg";
+            d = reinterpret_cast<musly::decoder*>(
+                musly::plugins::instantiate_plugin(
+                    musly::plugins::DECODER_TYPE, decoder_str));
+        } else if (decoder_str=="ffmpeg") {
+            decoder_str = "libav";
+            d = reinterpret_cast<musly::decoder*>(
+                musly::plugins::instantiate_plugin(
+                    musly::plugins::DECODER_TYPE, decoder_str));
+        }
+    }
+
     if (!d) {
         delete m;
-#ifdef HAVE_LIBAV
         return NULL;
-#endif
     }
     // if we succeeded in both, return the jukebox!
     musly_jukebox* mj = new musly_jukebox;

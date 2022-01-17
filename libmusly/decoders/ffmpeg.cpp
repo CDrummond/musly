@@ -44,7 +44,7 @@ inline FILE * openproc(const std::string &cmd, const char *mode) {
 namespace musly {
 namespace decoders {
 
-MUSLY_DECODER_REGIMPL(ffmpeg, 1);
+MUSLY_DECODER_REGIMPL(ffmpeg, 0);
 
 static const size_t constMaxLineLen = 180;
 static const std::string constDuration("Duration: ");
