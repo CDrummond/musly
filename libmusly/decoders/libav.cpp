@@ -208,7 +208,7 @@ libav::decodeto_22050hz_mono_float(
     #endif
     #define AVCODEC_FREE_CONTEXT(x) avcodec_free_context(x)
 #endif
-    AVCodec *dec = avcodec_find_decoder(decx->codec_id);
+    const AVCodec *dec = avcodec_find_decoder(decx->codec_id);
     if (!dec) {
         MINILOG(logERROR) << "Could not find codec.";
 
